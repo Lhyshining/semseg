@@ -1,5 +1,0 @@
-scikit-image
-opencv-python
-matplotlib
-python-tk
-

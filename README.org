@@ -1,7 +1,34 @@
-* Install original caffe
+* Introduction
+** Repos Refered
+- BVLC/caffe: https://github.com/BVLC/caffe.git
+- SegNet-Tutorial: https://github.com/alexgkendall/SegNet-Tutorial.git
+Rename to _SegNet_
+-alexgkendall/caffe-segnet:  https://github.com/alexgkendall/caffe-segnet.git
+This version supports cudnn v2 acceleration. 
+Therefore, it is not used here.
+- vgg-caffe: https://github.com/davidgengenbach/vgg-caffe.git
+- caffe-segnet-cudnn5: https://github.com/TimoSaemann/caffe-segnet-cudnn5.git
+  Located in SegNet/caffe-segnet
+** System Environment
+*** Linux ubuntu 16.04
+#+begin_src bash
+$ uname -a
+Linux yubao-Z370M-S01 4.15.0-51-generic #55~16.04.1-Ubuntu SMP Thu May 16 09:24:37 UTC 2019 x86_64 x86_64 x86_64 GNU/Linux
+#+end_src
+*** Cuda:10.0
+*** cuDNN v7.6.1+cuda 10.0
+*** Python 2.7
+** External Files
+*** Weights
+- VGG 16-layer mode: http://www.robots.ox.ac.uk/~vgg/research/very_deep/
+** Python pacages
+Refer SegNet/requirements.txt
+** Reference
+- Segnet tutorial: http://mi.eng.cam.ac.uk/projects/segnet/tutorial.html
+- Install caffe:  [[http://caffe.berkeleyvision.org/installation.html][Caffe-Installation Guide]]
+- Install cuDNN: [[https://docs.nvidia.com/deeplearning/sdk/cudnn-install/index.html#installlinux][Installing cuDNN on Linux]]
+* Build caffe
 ** Dependences
-Refer [[http://caffe.berkeleyvision.org/installation.html][Caffe-Installation Guide]] for detail.
-
 *** CUDA
 library version 7+ and the latest driver version are recommended, but 6.* is fine too
 5.5, and 5.0 are compatible but considered legacy
@@ -11,8 +38,6 @@ Check current cuda version:
 nvidia-smi
 #+end_src
 *** cuDNN
-- Reference:
-[[https://docs.nvidia.com/deeplearning/sdk/cudnn-install/index.html#installlinux][Installing cuDNN on Linux]]
 - cuDNN for GPU acceleration (v6)
 - download: https://developer.nvidia.com/rdp/cudnn-download
  - Download cuDNN v7.6.1 (June 24, 2019), for CUDA 10.1
@@ -51,8 +76,9 @@ Check current cudnn version
 $ cat /usr/include/cudnn.h | grep CUDNN_MAJOR -A 2
 #define CUDNN_MAJOR 7
 #+end_src
-** compile and install
+** compile caffe and install
 #+begin_src 
+cd caffe
 mkdir build
 cd build
 cmake -DCMAKE_INSTALL_PREFIX=<INSTALL_PATH> ..
@@ -60,15 +86,33 @@ make all
 make install
 make runtest
 #+end_src
-** Config environment variable path
+** Config python path
 #+begin_src bash
 export PYTHONPATH=<CAFFE_PATH>/python:$PYTHONPATH
 #+end_src
-* Build caffe-segnet-cudnn5
-[[https://github.com/TimoSaemann/caffe-segnet-cudnn5.git][TimoSaemann/caffe-segnet-cudnn5]]
-The compile process is the same as official coffe.
-* SegNet-Tutorial
-[[https://github.com/alexgkendall/SegNet-Tutorial][SegNet-Tutorial]]
+* Build caffe-segnet
+Official: [[https://github.com/TimoSaemann/caffe-segnet-cudnn5.git][TimoSaemann/caffe-segnet-cudnn5]]
+#+begin_src 
+cd SegNet/caffe-segnet
+mkdir build
+cd build
+cmake  ..
+make -j3
+#+end_src
+* SegNet: SegNet-Tutorial
+Official: [[https://github.com/alexgkendall/SegNet-Tutorial][SegNet-Tutorial]]
+** Structure
+#+begin_src bash
+$ tree -L 1
+├── caffe-segnet
+├── CamVid
+├── docker
+├── Example_Models
+├── Models
+├── README.md
+├── requirement.txt
+└── Scripts
+#+end_src
 ** Getting Started with Live Demo
 First open Scripts/webcam_demo.py and edit line 14 to match the path to your installation of SegNet. 
 
@@ -86,10 +130,61 @@ Type "help", "copyright", "credits" or "license" for more information.
 >>> exit()
 #+end_src
 
-* Download Tutorial
-[[https://github.com/alexgkendall/SegNet-Tutorial.git][alexgkendall/SegNet-Tutorial]]
+* SegNet
+** Setting Up Caffe and the Dataset
+Modify path of 
+- CamVid/test.txt
+- CamVid/train.txt
 
-* Install using conda
+vim:
+#+begin_src  bash
+:%s#SegNet#home/yubao/data/Project/semseg/SegNet-Tutorial-alexgkendall#g
+#+end_src
+
+1. Modify file path in:
+ - Models/segnet_train.prototxt
+#+begin_src bash
+   7   dense_image_data_param {
+   8     source: "/home/yubao/Project/semseg/SegNet-Tutorial-alexgkendall/CamVid/train.txt"  # Change this to the absolute      path to your data file
+   9     batch_size: 4               # Change this number to a batch size that will fit on your GPU
+#+end_src
+ - Models/segnet_inference.prototxt
+ - Models/segnet_solver.prototxt
+
+1. Create a folder to store your training weights and solver details with mkdir /SegNet/Models/Training
+
+** training SegNet-Basic 
+*** Dataset 
+CamVid dataset contains 367 training and 233 testing images of road scenes. 
+*** Train
+#+begin_src bash
+./SegNet/caffe-segnet/build/tools/caffe train -gpu 0 -solver /SegNet/Models/segnet_solver.prototxt  # This will begin training SegNet on GPU 0
+./SegNet/caffe-segnet/build/tools/caffe train -gpu 0 -solver ./SegNet/Models/segnet_basic_solver.prototxt  # This will begin training SegNet-Basic on GPU 0
+./SegNet/caffe-segnet/build/tools/caffe train -gpu 0 -solver ./SegNet/Models/segnet_solver.prototxt -weights /SegNet/Models/VGG_ILSVRC_16_layers.caffemodel  # This will begin training SegNet on GPU 0 with a pretrained encoder
+#+end_src
+
+*** Result for basics
+#+DOWNLOADED: file://./img/CamVid/test_1.png @ 2019-06-30 15:28:30
+#+attr_html: :width 320px
+#+attr_latex: :width 320cm
+#+attr_org: :width 320px
+[[file:images/SegNet/test_1_2019-06-30_15-28-30.png]]
+
+
+#+DOWNLOADED: file://./img/CamVid/test_1_res1.png @ 2019-06-30 15:29:14
+#+attr_html: :width 320px
+#+attr_latex: :width 320cm
+#+attr_org: :width 320px
+[[file:images/SegNet/test_1_res1_2019-06-30_15-29-14.png]]
+
+#+DOWNLOADED: file://img/CamVid/test_1_res2.png @ 2019-06-30 15:29:18
+#+attr_html: :width 320px
+#+attr_latex: :width 320cm
+#+attr_org: :width 320px
+[[file:images/SegNet/test_1_res2_2019-06-30_15-29-18.png]]
+
+
+* Install caffe using conda
 I have not yet tried this method
 Create 'caffe' virtual environment
 #+begin_src bash
