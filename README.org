@@ -1,0 +1,195 @@
+* Install original caffe
+** Dependences
+Refer [[http://caffe.berkeleyvision.org/installation.html][Caffe-Installation Guide]] for detail.
+
+*** CUDA
+library version 7+ and the latest driver version are recommended, but 6.* is fine too
+5.5, and 5.0 are compatible but considered legacy
+
+Check current cuda version:
+#+begin_src 
+nvidia-smi
+#+end_src
+*** cuDNN
+- Reference:
+[[https://docs.nvidia.com/deeplearning/sdk/cudnn-install/index.html#installlinux][Installing cuDNN on Linux]]
+- cuDNN for GPU acceleration (v6)
+- download: https://developer.nvidia.com/rdp/cudnn-download
+ - Download cuDNN v7.6.1 (June 24, 2019), for CUDA 10.1
+ - Download cuDNN v7.6.1 (June 24, 2019), for CUDA 10.0
+ - Download cuDNN v7.6.1 (June 24, 2019), for CUDA 9.2
+ - Download cuDNN v7.6.1 (June 24, 2019), for CUDA 9.0
+#+begin_src bash
+# cuDNN Runtime Library for Ubuntu16.04 (Deb)
+wget -c https://developer.nvidia.com/compute/machine-learning/cudnn/secure/v7.6.1.34/prod/10.0_20190620/Ubuntu16_04-x64/libcudnn7_7.6.1.34-1%2Bcuda10.0_amd64.deb
+# cuDNN Developer Library for Ubuntu16.04 (Deb)
+wget -c 
+https://developer.nvidia.com/compute/machine-learning/cudnn/secure/v7.6.1.34/prod/10.0_20190620/Ubuntu16_04-x64/libcudnn7-dev_7.6.1.34-1%2Bcuda10.0_amd64.deb
+# cuDNN Code Samples and User Guide for Ubuntu16.04 (Deb)
+https://developer.nvidia.com/compute/machine-learning/cudnn/secure/v7.6.1.34/prod/10.0_20190620/Ubuntu16_04-x64/libcudnn7-doc_7.6.1.34-1%2Bcuda10.0_amd64.deb
+#+end_src
+- Remove previous version
+#+begin_src bash
+sudo dpkg -r libcudnn7 libcudnn7-dev
+#+end_src
+- Install using dpkg
+#+begin_src bash
+sudo dpkg -i <new-cudnn-runtime>.deb
+sudo dpkg -i <new-cudnn-dev>.deb
+sudo ldconfig
+#+end_src
+
+My cuda version is 10.0 so I should install v7.61 for CUDA 10.0
+-  avoid auto upgrade when run /apt upgrade/ [very important]
+#+begin_src bash
+sudo apt-mark hold libcudnn7 libcudnn7-dev
+#+end_src
+
+I'm using version 7 + cuda 10
+Check current cudnn version
+#+begin_src bash
+$ cat /usr/include/cudnn.h | grep CUDNN_MAJOR -A 2
+#define CUDNN_MAJOR 7
+#+end_src
+** compile and install
+#+begin_src 
+mkdir build
+cd build
+cmake -DCMAKE_INSTALL_PREFIX=<INSTALL_PATH> ..
+make all
+make install
+make runtest
+#+end_src
+** Config environment variable path
+#+begin_src bash
+export PYTHONPATH=<CAFFE_PATH>/python:$PYTHONPATH
+#+end_src
+* Build caffe-segnet-cudnn5
+[[https://github.com/TimoSaemann/caffe-segnet-cudnn5.git][TimoSaemann/caffe-segnet-cudnn5]]
+The compile process is the same as official coffe.
+* SegNet-Tutorial
+[[https://github.com/alexgkendall/SegNet-Tutorial][SegNet-Tutorial]]
+** Getting Started with Live Demo
+First open Scripts/webcam_demo.py and edit line 14 to match the path to your installation of SegNet. 
+
+#+begin_src bash
+python Scripts/webcam_demo.py --model Example_Models/segnet_model_driving_webdemo.prototxt --weights /Example_Models/segnet_weights_driving_webdemo.caffemodel --colours /Scripts/camvid12.png
+#+end_src
+
+* Test python caffe
+#+begin_src bash
+$ python
+Python 2.7.12 (default, Nov 12 2018, 14:36:49)
+[GCC 5.4.0 20160609] on linux2
+Type "help", "copyright", "credits" or "license" for more information.
+>>> import caffe
+>>> exit()
+#+end_src
+
+* Download Tutorial
+[[https://github.com/alexgkendall/SegNet-Tutorial.git][alexgkendall/SegNet-Tutorial]]
+
+* Install using conda
+I have not yet tried this method
+Create 'caffe' virtual environment
+#+begin_src bash
+conda create -n caffe_gpu -c defaults python=3.6 caffe-gpu
+#+end_src
+
+* Error
+
+** Cudnn error when compile /caffe-segnet-cudnn5/
+Error message:
+#+begin_src bash
+(caffe_gpu) yubao@yubao-Z370M-S01:~/data/Project/semseg/caffe-segnet-cudnn5-TimoSaemann/build$ make
+Scanning dependencies of target proto
+[  0%] Building CXX object src/caffe/CMakeFiles/proto.dir/__/__/include/caffe/proto/caffe.pb.cc.o
+[  0%] Linking CXX static library ../../lib/libproto.a
+[  1%] Built target proto
+[  1%] Building NVCC (Device) object src/caffe/CMakeFiles/cuda_compile_1.dir/layers/cuda_compile_1_generated_absval_layer.cu.o
+/home/yubao/data/Project/semseg/caffe-segnet-cudnn5-TimoSaemann/include/caffe/util/cudnn.hpp(112): error: too few arguments in function call
+
+1 error detected in the compilation of "/tmp/tmpxft_000074ef_00000000-4_absval_layer.cpp4.ii".
+CMake Error at cuda_compile_1_generated_absval_layer.cu.o.Release.cmake:279 (message):
+  Error generating file
+  /home/yubao/data/Project/semseg/caffe-segnet-cudnn5-TimoSaemann/build/src/caffe/CMakeFiles/cuda_compile_1.dir/layers/./cuda_compile_1_generated_absval_layer.cu.o
+
+
+src/caffe/CMakeFiles/caffe.dir/build.make:499: recipe for target 'src/caffe/CMakeFiles/cuda_compile_1.dir/layers/cuda_compile_1_generated_absval_layer.cu.o' failed
+make[2]: *** [src/caffe/CMakeFiles/cuda_compile_1.dir/layers/cuda_compile_1_generated_absval_layer.cu.o] Error 1
+CMakeFiles/Makefile2:271: recipe for target 'src/caffe/CMakeFiles/caffe.dir/all' failed
+make[1]: *** [src/caffe/CMakeFiles/caffe.dir/all] Error 2
+Makefile:129: recipe for target 'all' failed
+make: *** [all] Error 2
+
+#+end_src
+Solution:
+
+It's happening due to cudnn.hpp (Location: include/caffe/util/cudnn.hpp) . Update cudnn.hpp file. It is not considering the current cuDNN versions.
+
+Update the cudnn.hpp from github repo, BVLC/caffe/include/caffe/util/cudnn.hpp
+Or, go to this link https://github.com/BVLC/caffe/blob/master/include/caffe/util/cudnn.hpp [Copy this and replace the old one]
+
+-  Python Caffe: Python 2.7 or Python 3.3+, numpy (>= 1.7), boost-provided boost.python
+- MATLAB Caffe: MATLAB with the mex compiler
+** cudnn error when testing neuron network
+#+begin_src bash
+yubao@yubao-Z370M-S01:~/data/Project/semseg/caffe$ ./build/examples/cpp_classification/classification.bin ./models/bvlc_reference_caffenet/deploy.prototxt ./models/bvlc_reference_caffenet/bvlc_reference_caffenet.caffemodel ./data/ilsvrc12/imagenet_mean.binaryproto ./data/ilsvrc12/synset_words.txt ./examples/images/cat.jpg
+F0630 09:11:41.399860 17359 cudnn_conv_layer.cpp:53] Check failed: status == CUDNN_STATUS_SUCCESS (1 vs. 0)  CUDNN_STATUS_NOT_INITIALIZED
+Check failure stack trace: ***
+    @     0x7fdf7114346d  google::LogMessage::Fail()
+    @     0x7fdf71145a23  google::LogMessage::SendToLog()
+    @     0x7fdf71142ffb  google::LogMessage::Flush()
+    @     0x7fdf7114496e  google::LogMessageFatal::~LogMessageFatal()
+    @     0x7fdf7170c0db  caffe::CuDNNConvolutionLayer<>::LayerSetUp()
+    @     0x7fdf718293dc  caffe::Net<>::Init()
+    @     0x7fdf7182c4a0  caffe::Net<>::Net()
+    @           0x4085bb  Classifier::Classifier()
+    @           0x4048c3  main
+    @     0x7fdf6c775830  __libc_start_main
+    @           0x405129  _start
+Aborted (core dumped)
+
+#+end_src
+
+Solution:
+1. Check my cuda version via /nvidia-smi/
+cuda 10.0
+1. Check /cudnn/ version
+#+begin_src bash
+yubao@yubao-Z370M-S01:~/data/Project/semseg/caffe$ dpkg -l | grep cuda |grep dnn
+ii  libcudnn7                                                7.6.0.64-1+cuda10.1                                   amd64        cuDNN runtime libraries
+ii  libcudnn7-dev                                            7.6.0.64-1+cuda10.1                                   amd64        cuDNN development libraries and headers
+#+end_src
+
+It looks like their version is inconsistent.
+
+It is caused by /apt-get upgrade/
+
+You can use
+#+begin_src bash
+sudo apt-mark hold libcudnn7 libcudnn7-dev
+#+end_src
+to avoid auto upgrade.
+
+1. remove current cudnn
+My cudnn directory is here:
+/usr/lib/x86_64-linux-gnu/libcudnn.so
+
+Remov all related libs
+#+begin_src bash
+sudo dpkg -r libcudnn7 libcudnn7-dev
+#+end_src
+
+1. Install cuDNN again whith correct version
+1. Finually succeed:
+#+begin_src bash
+yubao@yubao-Z370M-S01:~/data/Project/semseg/caffe$ ./build/examples/cpp_classification/classification.bin ./models/bvlc_reference_caffenet/deploy.prototxt ./models/bvlc_reference_caffenet/bvlc_reference_caffenet.caffemodel ./data/ilsvrc12/imagenet_mean.binaryproto ./data/ilsvrc12/synset_words.txt ./examples/images/cat.jpg
+---------- Prediction for ./examples/images/cat.jpg ----------
+0.3134 - "n02123045 tabby, tabby cat"
+0.2380 - "n02123159 tiger cat"
+0.1235 - "n02124075 Egyptian cat"
+0.1003 - "n02119022 red fox, Vulpes vulpes"
+0.0715 - "n02127052 lynx, catamount"
+#+end_src
+1. Reference: http://nhoj62003.blogspot.com/2017/10/caffe.html
