@@ -7,7 +7,7 @@ from argparse import ArgumentParser
 
 
 
-caffe_root = '/home/yubao/data/Project/semseg/SegNet-Tutorial-alexgkendall/caffe-segnet' 			# Change this to the absolute directory to SegNet Caffe
+caffe_root = '/home/yubao/data/Project/semseg/SegNet/caffe-segnet/build/install' 			# Change this to the absolute directory to SegNet Caffe
 import sys
 sys.path.insert(0, caffe_root + 'python')
 
