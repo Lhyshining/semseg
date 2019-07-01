@@ -193,7 +193,15 @@ Pascal VOC
 *** Training
 
 *** Testing
-
+*** Result
+#+begin_src bash
+I0630 21:12:15.934836  5739 sgd_solver.cpp:112] Iteration 599, lr = 0.0001
+I0630 21:12:17.073256  5739 solver.cpp:239] Iteration 600 (0.878424 iter/s, 1.1384s/1 iters), loss = 1.95768
+I0630 21:12:17.073312  5739 solver.cpp:258]     Train net output #0: loss = 1.8794 (* 1 = 1.8794 loss)
+I0630 21:12:17.073334  5739 sgd_solver.cpp:112] Iteration 600, lr = 0.0001
+itt:600 accuracy:0.9596
+Baseline accuracy:0.9240
+#+end_src
 * Possible Errors
 ** ImportError: No module named caffe
 #+begin_src bash
@@ -207,7 +215,7 @@ Solution:
 #+begin_src bash
 export PYTHONPATH=<CAFFE_PATH>/python:$PYTHONPATH
 eg:
- export PYTHONPATH=/home/yubao/data/Project/semseg/SegNet/caffe-segnet/python:$PYTHONPATH
+ export PYTHONPATH=/home/yubao/data/Project/semseg/SegNet/caffe-segnet/build/install/python:$PYTHONPATH
 #+end_src
 If still not work, check relative files.
 For example: 
@@ -216,7 +224,7 @@ Scripts/compute_bn_statistics.py
 
 #+begin_src bash
  9
- 10 caffe_root = '/home/yubao/data/Project/semseg/SegNet/caffe-segnet/build/install'          # Change this to the absolute     directory to SegNet Caffe
+ 10 caffe_root = '/home/yubao/data/Project/semseg/SegNet/caffe-segnet/build/install/python'          # Change this to the absolute     directory to SegNet Caffe
 #+end_src
 ** Cudnn error when compile /caffe-segnet-cudnn5/
 Error message:
