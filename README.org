@@ -123,6 +123,14 @@ $ tree -L 1
 ├── requirement.txt
 └── Scripts
 #+end_src
+** Build caffe-segnet
+#+begin_src bash
+mkdir build
+cd build
+cmake ..
+make
+make install
+#+end_src
 ** Getting Started with Live Demo
 First open Scripts/webcam_demo.py and edit line 14 to match the path to your installation of SegNet. 
 
