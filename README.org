@@ -1,36 +1,32 @@
 * Introduction
-** Repos Refered
 - BVLC/caffe: https://github.com/BVLC/caffe.git
-- SegNet-Tutorial: https://github.com/alexgkendall/SegNet-Tutorial.git
-Rename to _SegNet_
-- alexgkendall/caffe-segnet:  https://github.com/alexgkendall/caffe-segnet.git
-This version supports cudnn v2 acceleration. 
-Therefore, it is not used here.
+- SegNet-Tutorial: https://github.com/alexgkendall/SegNet-Tutorial.git Rename to _SegNet_
 - vgg-caffe: https://github.com/davidgengenbach/vgg-caffe.git
-- caffe-segnet-cudnn5: https://github.com/TimoSaemann/caffe-segnet-cudnn5.git
-  Located in SegNet/caffe-segnet
-** System Environment
-*** Linux ubuntu 16.04
+- caffe-segnet-cudnn5: https://github.com/TimoSaemann/caffe-segnet-cudnn5.git   Located at SegNet/caffe-segnet
+- ENET: A Deep Neural Network Architecture for Real-Time Semantic Segmentation
+* System Environment
+** Linux ubuntu 16.04
 #+begin_src bash
 $ uname -a
 Linux yubao-Z370M-S01 4.15.0-51-generic #55~16.04.1-Ubuntu SMP Thu May 16 09:24:37 UTC 2019 x86_64 x86_64 x86_64 GNU/Linux
 #+end_src
-*** Cuda
+** Cuda
 10.0
-*** cuDNN
+** cuDNN
 v7.6.1+cuda 10.0
-*** Python
+** Python
 2.7
-** External Files
-*** Weights
+* External Files
+** Weights
 - VGG 16-layer mode: http://www.robots.ox.ac.uk/~vgg/research/very_deep/
-** Python pacages
+* Python pacages
 Refer SegNet/requirements.txt
-** Reference
+* Reference
 - Segnet tutorial: http://mi.eng.cam.ac.uk/projects/segnet/tutorial.html
 - Install caffe:  [[http://caffe.berkeleyvision.org/installation.html][Caffe-Installation Guide]]
 - Install cuDNN: [[https://docs.nvidia.com/deeplearning/sdk/cudnn-install/index.html#installlinux][Installing cuDNN on Linux]]
 - Download pretrained model: https://github.com/alexgkendall/SegNet-Tutorial/blob/master/Example_Models/segnet_model_zoo.md
+- [[https://github.com/guanfuchen/semseg][guanfuchen/semseg]] 常用的语义分割架构结构综述以及代码复现
 * Build caffe
 ** Dependences
 *** CUDA
